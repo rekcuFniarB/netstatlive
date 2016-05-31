@@ -1,0 +1,3 @@
+[submodule "src/lib/netstat"]
+	path = src/lib/netstat
+	url = https://github.com/da667/netstat.git
