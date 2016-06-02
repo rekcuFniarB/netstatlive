@@ -7,6 +7,7 @@ from ttk import Treeview, Scrollbar, Notebook
 from time import sleep
 from threading import Thread
 from Queue import Queue
+from collections import OrderedDict
 
 sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'lib', 'netstat'))
 from netstat import netstat_tcp4, netstat_tcp6, netstat_udp4, netstat_udp6
@@ -25,11 +26,12 @@ class Application(tk.Frame):
         
         self.tabs = Notebook(master)
         
-        self.tabs_frames = {'TCP4': {'tab': None, 'tbl': None, 'query': netstat_tcp4},
-                            'UDP4': {'tab': None, 'tbl': None, 'query': netstat_udp4},
-                            'TCP6': {'tab': None, 'tbl': None, 'query': netstat_tcp6},
-                            'UDP6': {'tab': None, 'tbl': None, 'query': netstat_udp6}
-                           }
+        self.tabs_frames = OrderedDict()
+        self.tabs_frames['TCP4'] = {'query': netstat_tcp4}
+        self.tabs_frames['UDP4'] = {'query': netstat_udp4}
+        self.tabs_frames['TCP6'] = {'query': netstat_tcp6}
+        self.tabs_frames['UDP6'] = {'query': netstat_udp6}
+        
         for tab in self.tabs_frames:
             # Creating tabs
             self.tabs_frames[tab]['tab'] = tk.Frame(self.tabs)
