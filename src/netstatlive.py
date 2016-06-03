@@ -17,14 +17,14 @@ class Application(tk.Frame):
         tk.Frame.__init__(self, master)
         self.master = master
         self.master.title("Netstat Live")
-        self.pack()
+        self.pack(fill=tk.BOTH, expand=tk.Y)
         
         master.protocol("WM_DELETE_WINDOW", self.app_quit)
         self._app_quit = False
         
         self._freeze = False
         
-        self.tabs = Notebook(master)
+        self.tabs = Notebook(self)
         
         self.tabs_frames = OrderedDict()
         self.tabs_frames['TCP4'] = {'query': netstat_tcp4}
