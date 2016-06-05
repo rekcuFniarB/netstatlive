@@ -185,7 +185,10 @@ class Application(tk.Frame):
             reverse = None
         
         try:
-            out = subprocess.check_output(['whois', addr[0]])
+            try:
+                out = subprocess.check_output(['whois', addr[0]])
+            except:
+                out = 'No info for this host.'
             self.whois_popup = {}
             self.whois_popup['window'] = tk.Toplevel(self)
             self.whois_popup['window'].title('Whois %s' % addr[0])
