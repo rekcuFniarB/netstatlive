@@ -60,16 +60,23 @@ class Application(tk.Frame):
         
         # Check dependencies
         self._xclip = True
+        self._whois = True
         try:
             out = subprocess.check_output(['xclip', '-h'], stderr=subprocess.STDOUT)
         except:
             self._xclip = False
+        try:
+            out = subprocess.check_output(['whois', '--version'], stderr=subprocess.STDOUT)
+        except:
+            self._whois = False
         
         # Connections list context menu
         self._remote_addr = ''
         self.context_menu = tk.Menu(self, tearoff=0)
         if self._xclip:
             self.context_menu.add_command(label='Copy remote addr.', command=self.xclip)
+        if self._whois:
+            self.context_menu.add_command(label='Whois', command=self.whois)
         self.tabs.bind('<Button-1>', self.context_menu_unpost)
         
         self.queue = Queue(maxsize=1)
@@ -161,13 +168,42 @@ class Application(tk.Frame):
     def xclip(self, data=None):
         if not data:
             data = self._remote_addr
-        print data
         try:
             xclip = subprocess.Popen(['xclip', '-selection', 'clipboard'], stdin=subprocess.PIPE)
             xclip.communicate(input=data)
             xclip.terminate()
         except:
             pass
+    
+    def whois(self, addr=None):
+        if not addr:
+            addr = self._remote_addr
+        addr = addr.split(':')
+        try:
+            reverse = subprocess.check_output(['dig', '+short', '-x', addr[0]])
+        except:
+            reverse = None
+        
+        try:
+            out = subprocess.check_output(['whois', addr[0]])
+            self.whois_popup = {}
+            self.whois_popup['window'] = tk.Toplevel(self, width=500, height=500)
+            self.whois_popup['window'].title('Whois %s' % addr[0])
+            self.whois_popup['scrollbar_y'] = Scrollbar(self.whois_popup['window'])
+            self.whois_popup['scrollbar_y'].pack(side=tk.RIGHT, fill=tk.Y)
+            self.whois_popup['text_frame'] = tk.Text(self.whois_popup['window'], wrap=tk.WORD)
+            self.whois_popup['text_frame'].pack()
+            #self.whois_popup['text_frame']['yscrollcommand']=self.whois_popup['scrollbar_y'].set
+            self.whois_popup['scrollbar_y'].config(command=self.whois_popup['text_frame'].yview)
+            self.whois_popup['text_frame'].config(yscrollcommand=self.whois_popup['scrollbar_y'].set)
+            if reverse:
+                reverse = 'Reverse lookup: %s\n' % reverse
+                self.whois_popup['text_frame'].insert(tk.END, reverse)
+            self.whois_popup['text_frame'].insert(tk.END, out)
+            
+            tk.Button(self.whois_popup['window'], text='Ok', command=self.whois_popup['window'].destroy).pack()
+        except:
+            raise #pass
 
 
 if __name__ == '__main__':
