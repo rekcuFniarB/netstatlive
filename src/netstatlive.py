@@ -100,7 +100,10 @@ class Application(tk.Frame):
         while not self._app_quit:
             if queue.empty():
                 # Get netstat data
-                netstat = self.tabs_frames[self.tabs.tab(self.tabs.select(), 'text')]['query']()
+                try:
+                    netstat = self.tabs_frames[self.tabs.tab(self.tabs.select(), 'text')]['query']()
+                except RuntimeError:
+                    sys.stderr.write('Main thread destroyed.\n')
                 # Put no queue
                 queue.put(netstat, True)
             else:
@@ -170,4 +173,9 @@ class Application(tk.Frame):
 if __name__ == '__main__':
     app = Application(tk.Tk())
     app.master.after(10, app.refresh)
-    app.master.mainloop()
+    try:
+        app.master.mainloop()
+    except KeyboardInterrupt:
+        app.app_quit()
+    except:
+        raise
