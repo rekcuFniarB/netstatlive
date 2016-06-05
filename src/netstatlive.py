@@ -1,7 +1,7 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-import sys, os
+import sys, os, subprocess
 import Tkinter as tk
 from ttk import Treeview, Scrollbar, Notebook
 from time import sleep
@@ -47,6 +47,9 @@ class Application(tk.Frame):
             self.tabs_frames[tab]['tbl']['yscroll'] = self.tabs_frames[tab]['scrollbar_y'].set
             self.tabs_frames[tab]['scrollbar_y'].pack(side=tk.RIGHT, fill=tk.Y)
             self.tabs_frames[tab]['tbl'].pack(expand=tk.Y, fill=tk.BOTH)
+            # Bind right click event for displaying context menu
+            self.tabs_frames[tab]['tbl'].bind('<Button-3>', self.context_menu_popup)
+            self.tabs_frames[tab]['tbl'].bind('<Button-1>', self.context_menu_unpost)
         self.tabs.pack(fill=tk.BOTH, expand=tk.Y)
         
         # Freeze button
@@ -55,10 +58,44 @@ class Application(tk.Frame):
         self.freeze_btn = tk.Button(self.buttons, text='Freeze', command=self.freeze_btn_handler)
         self.freeze_btn.pack(side=tk.RIGHT)
         
+        # Check dependencies
+        self._xclip = True
+        try:
+            out = subprocess.check_output(['xclip', '-h'], stderr=subprocess.STDOUT)
+        except:
+            self._xclip = False
+        
+        # Connections list context menu
+        self._remote_addr = ''
+        self.context_menu = tk.Menu(self, tearoff=0)
+        if self._xclip:
+            self.context_menu.add_command(label='Copy remote addr.', command=self.xclip)
+        self.tabs.bind('<Button-1>', self.context_menu_unpost)
+        
         self.queue = Queue(maxsize=1)
         self.poll = Thread(target=self.thread, args=(self.queue,))
         self.poll.start()
         
+    def context_menu_popup(self, event):
+        tbl = self.get_active_tab()
+        item = tbl.identify_row(event.y)
+        if item and len(tbl.get_children(item)) == 0:
+            tbl.selection_set(item)
+            # Get remote addr value
+            self._remote_addr = tbl.set(item, column='Remote addr')
+            self.context_menu.post(event.x_root, event.y_root)
+        else:
+            # Mouse pointer is not over item
+            pass
+    
+    def context_menu_unpost(self, event):
+        self.context_menu.unpost()
+
+    def get_active_tab(self):
+        current_tab = self.tabs.tab(self.tabs.select(), 'text')
+        tbl = self.tabs_frames[current_tab]['tbl']
+        return tbl
+    
     def thread(self, queue):
         while not self._app_quit:
             if queue.empty():
@@ -117,6 +154,18 @@ class Application(tk.Frame):
         else:
             self.freeze_btn['text'] = 'Continue'
         self._freeze = not self._freeze
+
+    def xclip(self, data=None):
+        if not data:
+            data = self._remote_addr
+        print data
+        try:
+            xclip = subprocess.Popen(['xclip', '-selection', 'clipboard'], stdin=subprocess.PIPE)
+            xclip.communicate(input=data)
+            xclip.terminate()
+        except:
+            pass
+
 
 if __name__ == '__main__':
     app = Application(tk.Tk())
