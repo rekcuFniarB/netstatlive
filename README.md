@@ -4,7 +4,7 @@ Netstat Live
 About
 -----
 
-Netstat Live is a graphical network connections monitor grouping by processes based on [this module](https://github.com/da667/netstat).
+Netstat Live is a graphical network connections monitor grouping by process names. Based on [this module](https://github.com/da667/netstat).
 
 Not all processes can be identified, non-owned process info  will not be shown, you would have to run as root to see it all.
 
@@ -17,10 +17,10 @@ Requirements
 * [netstat module](https://github.com/da667/netstat)
 * tkinter (debian: python-tk)
 * whois (optional)
-* dns-utils (optional, using for reverse lookup)
+* dig from dns-utils (optional, using for reverse lookup)
 
-Bulds
------
+Builds
+------
 
 [Deb package](http://brainfucker.myihor.ru/share/apps/netstatlive/builds/netstatlive_0.1-2_all.deb) (Ubuntu, Debian)
 
