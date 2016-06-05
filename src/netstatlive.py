@@ -201,31 +201,27 @@ class Application(tk.Frame):
             reverse = None
         
         try:
-            try:
-                out = subprocess.check_output(['whois', addr[0]])
-            except:
-                out = 'No info for this host.'
-            self.whois_popup = {}
-            self.whois_popup['window'] = tk.Toplevel(self)
-            self.whois_popup['window'].title('Whois %s' % addr[0])
-            self.whois_popup['frame'] = tk.Frame(self.whois_popup['window'])
-            self.whois_popup['frame'].pack(fill=tk.BOTH, expand=tk.Y)
-            self.whois_popup['text'] = tk.Text(self.whois_popup['frame'], wrap=tk.WORD, height=32, width=96)
-            self.whois_popup['text'].pack(fill=tk.BOTH, expand=tk.Y, side=tk.LEFT)
-            self.whois_popup['scrollbar_y'] = Scrollbar(self.whois_popup['frame'])
-            #self.whois_popup['text_frame']['yscrollcommand']=self.whois_popup['scrollbar_y'].set
-            self.whois_popup['scrollbar_y'].config(command=self.whois_popup['text'].yview)
-            self.whois_popup['scrollbar_y'].pack(side=tk.RIGHT, fill=tk.Y)
-            self.whois_popup['text'].config(yscrollcommand=self.whois_popup['scrollbar_y'].set)
-            if reverse:
-                reverse = 'Reverse lookup: %s\n' % reverse
-                self.whois_popup['text'].insert(tk.END, reverse)
-            self.whois_popup['text'].insert(tk.END, out)
-            
-            tk.Button(self.whois_popup['window'], text='Ok', command=self.whois_popup['window'].destroy).pack()
+            out = subprocess.check_output(['whois', addr[0]])
         except:
-            raise #pass
-
+            out = 'No info for this host.'
+        
+        self.whois_popup = {}
+        self.whois_popup['window'] = tk.Toplevel(self)
+        self.whois_popup['window'].title('Whois %s' % addr[0])
+        self.whois_popup['frame'] = tk.Frame(self.whois_popup['window'])
+        self.whois_popup['frame'].pack(fill=tk.BOTH, expand=tk.Y)
+        self.whois_popup['text'] = tk.Text(self.whois_popup['frame'], wrap=tk.WORD, height=32, width=96)
+        self.whois_popup['text'].pack(fill=tk.BOTH, expand=tk.Y, side=tk.LEFT)
+        self.whois_popup['scrollbar_y'] = Scrollbar(self.whois_popup['frame'])
+        self.whois_popup['scrollbar_y'].config(command=self.whois_popup['text'].yview)
+        self.whois_popup['scrollbar_y'].pack(side=tk.RIGHT, fill=tk.Y)
+        self.whois_popup['text'].config(yscrollcommand=self.whois_popup['scrollbar_y'].set)
+        if reverse:
+            reverse = 'Reverse lookup: %s\n' % reverse
+            self.whois_popup['text'].insert(tk.END, reverse)
+        self.whois_popup['text'].insert(tk.END, out)
+            
+        tk.Button(self.whois_popup['window'], text='Ok', command=self.whois_popup['window'].destroy).pack()
 
 if __name__ == '__main__':
     app = Application(tk.Tk())
