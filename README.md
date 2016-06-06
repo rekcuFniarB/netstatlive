@@ -22,7 +22,7 @@ Requirements
 Builds
 ------
 
-[Deb package](http://brainfucker.myihor.ru/share/apps/netstatlive/builds/netstatlive_0.1-2_all.deb) (Ubuntu, Debian)
+[Deb package](http://brainfucker.myihor.ru/share/apps/netstatlive/builds/netstatlive_0.1.1-2_all.deb) (Ubuntu, Debian)
 
 Screenshots
 -----------
