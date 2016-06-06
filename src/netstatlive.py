@@ -127,7 +127,7 @@ class Application(tk.Frame):
                     netstat = self.tabs_frames[self.tabs.tab(self.tabs.select(), 'text')]['query']()
                 except RuntimeError:
                     sys.stderr.write('Main thread destroyed.\n')
-                # Put no queue
+                # Put to queue
                 queue.put(netstat, True)
             else:
                 sleep(0.5)
