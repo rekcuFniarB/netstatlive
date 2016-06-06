@@ -29,6 +29,6 @@ Screenshots
 
 ![Screenshot: main window](http://i.imgur.com/lLHW8hf.png "Screenshot: main window")
 
-![Screenshot: context menu](http://i.imgur.com/H6oDCAD.png "Screenshot: context-menu")
+![Screenshot: context menu](http://i.imgur.com/xMpgnRO.png "Screenshot: context-menu")
 
 ![Screenshot: whois popup](http://i.imgur.com/xi9Z970.png "Screenshot: whois pupup")

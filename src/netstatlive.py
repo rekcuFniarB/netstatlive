@@ -141,6 +141,10 @@ class Application(tk.Frame):
             current_tab = self.tabs.tab(self.tabs.select(), 'text')
             # Get active tab
             tbl = self.tabs_frames[current_tab]['tbl']
+            
+            # Remember focus
+            self.tabs_frames[current_tab]['focus'] = tbl.selection()
+            
             data = self.queue.get(False)
             processes = []
             for proc in data:
@@ -161,8 +165,9 @@ class Application(tk.Frame):
                 proc_name = '%s (%s)' % (os.path.basename(str(proc[6])), str(proc[6]))
                 #         Pid           User          Local addr    Remote addr   State
                 values = (str(proc[5]), str(proc[1]), str(proc[2]), str(proc[3]), str(proc[4]))
+                h = hash(tuple(proc))
                 try:
-                    tbl.insert(proc_name, 'end', text=proc_name, values=values)
+                    tbl.insert(proc_name, 'end', h, text=proc_name, values=values)
                 except:
                     pass
     
@@ -170,6 +175,12 @@ class Application(tk.Frame):
             for proc in tbl.get_children():
                 if len(tbl.get_children(proc)) == 0:
                     tbl.delete(proc)
+            
+            # Restore focus
+            try:
+                tbl.selection_set(self.tabs_frames[current_tab]['focus'])
+            except:
+                pass
             
         self.master.after(500, self.refresh)
         
