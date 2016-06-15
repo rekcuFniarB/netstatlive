@@ -18,6 +18,7 @@ Requirements
 * tkinter (debian: python-tk)
 * whois (optional)
 * dig from dns-utils (optional, using for reverse lookup)
+* xclip (optional, using for copying remote address)
 
 Screenshots
 -----------
