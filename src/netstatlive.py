@@ -116,9 +116,14 @@ class Application(tk.Frame):
         self.context_menu.unpost()
 
     def get_active_tab(self):
-        current_tab = self.tabs.tab(self.tabs.select(), 'text')
-        #tbl = self.tabs_frames[current_tab]['tbl']
-        return current_tab
+        try:
+            current_tab = self.tabs.tab(self.tabs.select(), 'text')
+            return current_tab
+        except RuntimeError:
+            # Sometimes raised on KeyboardInterrupt
+            sys.stderr.write('Terminated.\n')
+            self._app_quit = True
+            sys.exit(0)
     
     def thread(self):
         while not self._app_quit:
