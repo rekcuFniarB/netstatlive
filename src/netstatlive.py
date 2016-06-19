@@ -66,6 +66,8 @@ class Application(tk.Frame):
             # Bind right click event for displaying context menu
             self.tabs_frames[tab]['tbl'].bind('<Button-3>', self.context_menu_popup)
             self.tabs_frames[tab]['tbl'].bind('<Button-1>', self.context_menu_unpost)
+            # Creating queue for each tab
+            self.tabs_frames[tab]['queue'] = Queue(maxsize=1)
         self.tabs.pack(fill=tk.BOTH, expand=tk.Y)
         
         # Freeze button
@@ -95,8 +97,7 @@ class Application(tk.Frame):
             self.context_menu.add_command(label='Whois', command=self.whois)
         self.tabs.bind('<Button-1>', self.context_menu_unpost)
         
-        self.queue = Queue(maxsize=1)
-        self.poll = Thread(target=self.thread, args=(self.queue,))
+        self.poll = Thread(target=self.thread)
         self.poll.start()
         
     def context_menu_popup(self, event):
@@ -116,19 +117,20 @@ class Application(tk.Frame):
 
     def get_active_tab(self):
         current_tab = self.tabs.tab(self.tabs.select(), 'text')
-        tbl = self.tabs_frames[current_tab]['tbl']
-        return tbl
+        #tbl = self.tabs_frames[current_tab]['tbl']
+        return current_tab
     
-    def thread(self, queue):
+    def thread(self):
         while not self._app_quit:
-            if queue.empty():
+            current_tab = self.tabs_frames[self.get_active_tab()]
+            if current_tab['queue'].empty():
                 # Get netstat data
                 try:
-                    netstat = self.tabs_frames[self.tabs.tab(self.tabs.select(), 'text')]['query']()
+                    netstat = current_tab['query']()
                 except RuntimeError:
                     sys.stderr.write('Main thread destroyed.\n')
                 # Put to queue
-                queue.put(netstat, True)
+                current_tab['queue'].put(netstat, True)
             else:
                 sleep(0.5)
     
@@ -137,15 +139,17 @@ class Application(tk.Frame):
         self.master.destroy()
     
     def refresh(self):
-        if not self._freeze and not self.queue.empty():
-            current_tab = self.tabs.tab(self.tabs.select(), 'text')
+        current_tab = self.get_active_tab()
+        queue = self.tabs_frames[current_tab]['queue']
+        if not self._freeze and not queue.empty():
+            
             # Get active tab
             tbl = self.tabs_frames[current_tab]['tbl']
             
             # Remember focus
             self.tabs_frames[current_tab]['focus'] = tbl.selection()
             
-            data = self.queue.get(False)
+            data = queue.get(False)
             processes = []
             for proc in data:
                 processes.append(proc[6])
