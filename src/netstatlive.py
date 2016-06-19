@@ -101,7 +101,8 @@ class Application(tk.Frame):
         self.poll.start()
         
     def context_menu_popup(self, event):
-        tbl = self.get_active_tab()
+        current_tab = self.get_active_tab()
+        tbl = self.tabs_frames[current_tab]['tbl']
         item = tbl.identify_row(event.y)
         if item and len(tbl.get_children(item)) == 0:
             tbl.selection_set(item)
